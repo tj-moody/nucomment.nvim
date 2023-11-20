@@ -67,13 +67,19 @@ _G.callback = function()
     local block_commented = true
     for line_nr = start_line, end_line do
         local indent = vim.fn.indent(line_nr)
-        if indent < min_indent then
+        if indent < min_indent and vim.fn.getline(line_nr) ~= '' then
             min_indent = indent
         end
 
         local stripped_line = vim.fn.getline(line_nr):gsub("^%s*", "") ---@diagnostic disable-line
-        if stripped_line:sub(1, commentstring:len()) ~= commentstring then
-            block_commented = false
+        if stripped_line:len() == commentstring:len() - 1 then
+            if stripped_line ~= commentstring:sub(1, stripped_line:len()) then
+                block_commented = false
+            end
+        else
+            if commentstring ~= stripped_line:sub(1, commentstring:len()) then
+                block_commented = false
+            end
         end
     end
 
@@ -87,9 +93,9 @@ end
 M.setup = function(user_config)
     M.config = vim.tbl_deep_extend("force", default_config, user_config)
     vim.keymap.set('n', '<Plug>comment_toggle', comment_toggle_lines, { expr = true, desc = 'Comment toggle' })
-    vim.keymap.set('n', '<leader>c', '<Plug>comment_toggle', {})
-    vim.keymap.set('x', '<leader>c', '<Esc>`<<Plug>comment_toggle`>gv', {})
-    vim.keymap.set('n', '<leader>cc', '<Plug>comment_toggle l', {})
+    vim.keymap.set('n', '<leader>c',  '<Plug>comment_toggle',   {})
+    vim.keymap.set('n', '<leader>cc', '<Plug>comment_toggle _', {})
+    vim.keymap.set('x', '<leader>c', comment_toggle_lines, { expr = true })
 end
 
 M.toggle_floating_comments = function()
