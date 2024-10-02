@@ -59,6 +59,7 @@ end
 
 
 _G.callback = function()
+    -- Todo: change to support markdown-style comments with a postfix, i.e. <!-- %s --->
     local commentstring = vim.bo.commentstring:sub(1, -3)
     local start_line, _ = unpack(vim.api.nvim_buf_get_mark(0, "[")) ---@diagnostic disable-line
     local end_line, _ = unpack(vim.api.nvim_buf_get_mark(0, "]")) ---@diagnostic disable-line
